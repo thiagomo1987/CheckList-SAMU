@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Operacional - SAMU 192</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-red-600 text-white p-2 rounded-lg font-bold text-lg">
+                    <i class="fa-solid fa-truck-medical"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">SAMU 192 - Checklist</h1>
+                    <p class="text-xs text-blue-200">Controle Operacional de Viatura</p>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="switchView('form')" id="btnForm" class="bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1 shadow-inner">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    <span class="hidden sm:inline">Preencher</span>
+                </button>
+                <button onclick="switchView('admin')" id="btnAdmin" class="bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span class="hidden sm:inline">Painel Local</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- VIEW 1: FORMULÁRIO DE CHECKLIST -->
+        <section id="viewForm" class="space-y-6">
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                    <i class="fa-solid fa-file-pen text-blue-600 mr-2"></i> Identificação da Viatura e Turno
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Viatura / Base</label>
+                        <select id="viatura" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <optgroup label="Suporte Avançado (Alfa)">
+                                <option value="Alfa 1">Alfa 1</option>
+                                <option value="Alfa 2">Alfa 2</option>
+                            </optgroup>
+                            <optgroup label="Suporte Básico (Beta)">
+                                <option value="Beta 1">Beta 1</option>
+                                <option value="Beta 2">Beta 2</option>
+                                <option value="Beta 3">Beta 3</option>
+                                <option value="Beta 4">Beta 4</option>
+                                <option value="Beta 5">Beta 5</option>
+                                <option value="Beta 6">Beta 6</option>
+                                <option value="Beta 7">Beta 7</option>
+                            </optgroup>
+                            <optgroup label="Resgate / Outros (G)">
+                                <option value="G1">G1</option>
+                                <option value="G2">G2</option>
+                                <option value="G3">G3</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Profissional Responsável</label>
+                        <input type="text" id="profissional" placeholder="Seu Nome / Matrícula" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Turno</label>
+                        <select id="turno" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="07h às 19h">07h às 19h (Diurno)</option>
+                            <option value="19h às 07h">19h às 07h (Noturno)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Listas de Itens Agrupados -->
+            <div id="checklistContainer" class="space-y-6">
+                <!-- Preenchido via JavaScript -->
+            </div>
+
+            <div class="pt-4 pb-12 flex justify-end">
+                <button onclick="submitChecklist()" id="btnSubmit" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition flex items-center space-x-2 text-base w-full sm:w-auto justify-center">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Enviar Checklist para a Central</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 2: PAINEL ADMINISTRADOR -->
+        <section id="viewAdmin" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs uppercase font-bold text-slate-400">Total Enviados</p>
+                        <h3 id="statTotal" class="text-2xl font-black text-slate-800">0</h3>
+                    </div>
+                    <div class="bg-blue-100 text-blue-600 p-3 rounded-lg text-lg"><i class="fa-solid fa-clipboard-list"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs uppercase font-bold text-slate-400">Com Pendências</p>
+                        <h3 id="statPendencias" class="text-2xl font-black text-red-600">0</h3>
+                    </div>
+                    <div class="bg-red-100 text-red-600 p-3 rounded-lg text-lg"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs uppercase font-bold text-slate-400">Status Geral</p>
+                        <h3 id="statStatus" class="text-lg font-bold text-green-600">Atualizado</h3>
+                    </div>
+                    <div class="bg-green-100 text-green-600 p-3 rounded-lg text-lg"><i class="fa-solid fa-circle-check"></i></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
+                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-clock-rotate-left mr-2 text-blue-600"></i> Histórico Salvo no Aparelho</h3>
+                    <button onclick="clearHistory()" class="text-xs text-red-600 hover:text-red-800 font-semibold"><i class="fa-solid fa-trash mr-1"></i> Limpar Histórico</button>
+                </div>
+                <div id="adminList" class="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.0
+    </footer>
+
+    <!-- Script da Aplicação -->
+    <script>
+        // URL DO GOOGLE APPS SCRIPT (Cole sua URL gerada no passo 2 aqui embaixo)
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOoc9ITf4OFLrN6X9x5oRCocB4dS4EYR62ha0eiA89w0aosyxFjOfC8B0XJVA3cVa9/exec";
+
+        // Estrutura completa baseada no Checklist Beta oficial
+        const checklistData = [
+            {
+                categoria: "Equipamentos Gerais e Imobilização Básica",
+                itens: [
+                    "Colar Cervical - P (2 un)",
+                    "Colar Cervical - M (2 un)",
+                    "Colar Cervical - G (2 un)",
+                    "Kit Head Block - VTR Branca (2 un)",
+                    "Kit 3 Tirantes - VTR Branca (2 un)",
+                    "Caixa Luvas P / M / G (1 un cada)",
+                    "Lençol Tecido (4 un)",
+                    "Rolo de Papel Lençol (1 un)",
+                    "Bandagens Triangulares (10 un)",
+                    "Pacotes de Gaze (10 un)",
+                    "Pacotes de Chumaço (10 un)",
+                    "Atadura de Crepe 10 cm (10 un)",
+                    "Atadura de Crepe 20 cm (10 un)"
+                ]
+            },
+            {
+                categoria: "Soros, Medicações e Inalação",
+                itens: [
+                    "Frascos S.F. 500ml e 250ml",
+                    "Frascos S.G. 250ml e 500ml",
+                    "Frascos Ringer Lactato 500ml (2 un)",
+                    "Kit Inalação (1 un)",
+                    "Máscara com reservatório Adulto (5 un) e Infantil (2 un)",
+                    "Água Destilada - ampola (4 un)",
+                    "Dipirona - ampola (3 un)",
+                    "Glicose 25% ou 50% - ampola (8 un)",
+                    "Hidrocortisona 500 mg (2 un)",
+                    "AAS 100 mg - comprimido (10 un)",
+                    "Captopril 25 mg - comprimido (10 un)",
+                    "Tubo de Fita Dextro (1 un)"
+                ]
+            },
+            {
+                categoria: "Materiais de Punção e Acessórios",
+                itens: [
+                    "Máscaras Cirúrgicas (6 un)",
+                    "Seringas 3 à 20 ml (3 un)",
+                    "Agulhas 40X12 / 25X8 / 30X7 (5 un)",
+                    "Scalp nº 25 à 27 (2 un)",
+                    "Abocath nº 14 à 24 (3 un)",
+                    "Equipos Macrogotas (3 un)",
+                    "Garrote (2 un)",
+                    "Termômetro Digital (1 un)",
+                    "Esparadrapo Estreito e Largo (1 un)",
+                    "Frasco Aspirador c/ Extensão - painel (1 un)",
+                    "Almotolia Álcool 70% (1 un)",
+                    "Óculos de Proteção (2 un)"
+                ]
+            },
+            {
+                categoria: "Aparelhos, Limpeza e Bolsas Reserva",
+                itens: [
+                    "DEA - Patrimônio (1 un)",
+                    "Caixa de Perfuro Cortante (1 un)",
+                    "Oxímetro - Patrimônio (1 un)",
+                    "Kit Algodão (1 un)",
+                    "Cobertor em saco plástico (1 un)",
+                    "Caixa de Ferramentas / Fita Zebrada (1 un)",
+                    "Kit Psiquiatria / Cobertura de Óbito (1 un)",
+                    "Sacos p/ Lixo 30L Branco e Preto (4 un)",
+                    "Pano de Chão / Esponja / Detergente (1 un)",
+                    "Frasco de Álcool Gel (1 un)",
+                    "Cilindro O2 Transporte (1 un)"
+                ]
+            },
+            {
+                categoria: "Mochila de Vias Aéreas",
+                itens: [
+                    "Cilindro de O2 (1 un)",
+                    "Frasco Aspirador com Extensão (1 un)",
+                    "Umidificador com Máscara Adulto e Infantil (1 un)",
+                    "Respirador Manual (Ambu) Adulto e Infantil (1 un)",
+                    "Cânula Guedel nº 0 a 5 (1 un)",
+                    "Abaixador de Língua (5 un)",
+                    "Sonda de Aspiração nº 4 a 16 (1 un)"
+                ]
+            },
+            {
+                categoria: "Mochila de Imobilização",
+                itens: [
+                    "Talhas GG, G, M, P, PP (4 un cada)",
+                    "Bandagem Triangular (10 un)",
+                    "Atadura Crepe 20cm (10 un) e 10cm (6 un)",
+                    "Chumaço (5 un) / Mantas Térmicas (2 un)"
+                ]
+            },
+            {
+                categoria: "Mochila Beta (Procedimentos / Parto)",
+                itens: [
+                    "Bandagem Triangular (3 un) / Gaze (5 pc) / Chumaço (2 pc)",
+                    "Ataduras 10cm (3 un) e 20cm (2 un)",
+                    "Abocath 14 ao 24 (2 un) / Esparadrapo P (1 un)",
+                    "Glicose 25% e 50% (8 ampolas)",
+                    "Tubo de Fita Reagente / Agulhas / Algodão",
+                    "Esfigmomanômetro e Estetoscópio Adulto",
+                    "Cânula Guedel 0 a 5 / Abaixador de língua (5 un)",
+                    "Mantas Aluminizadas (2 un) / SF e SG 250ml",
+                    "Kit Mochila de Parto (1 un)"
+                ]
+            }
+        ];
+
+        // Renderizar Formulário
+        function renderForm() {
+            const container = document.getElementById('checklistContainer');
+            let html = '';
+
+            checklistData.forEach((cat, catIdx) => {
+                html += `
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-5 py-3 border-b border-slate-200 font-bold text-slate-700 flex items-center">
+                            <span class="bg-blue-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-xs mr-2">${catIdx + 1}</span>
+                            ${cat.categoria}
+                        </div>
+                        <div class="p-4 space-y-3">
+                `;
+
+                cat.itens.forEach((item, itemIdx) => {
+                    const itemId = `cat_${catIdx}_item_${itemIdx}`;
+                    html += `
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between py-2 border-b border-slate-100 last:border-none gap-2">
+                            <span class="text-sm font-medium text-slate-700">${item}</span>
+                            <div class="flex items-center space-x-2">
+                                <label class="inline-flex items-center cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-green-50 has-[:checked]:bg-green-600 has-[:checked]:text-white has-[:checked]:border-green-600 transition">
+                                    <input type="radio" name="${itemId}" value="OK" checked class="sr-only"> OK
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-red-50 has-[:checked]:bg-red-600 has-[:checked]:text-white has-[:checked]:border-red-600 transition">
+                                    <input type="radio" name="${itemId}" value="Em Falta" class="sr-only"> Em Falta
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-amber-50 has-[:checked]:bg-amber-500 has-[:checked]:text-white has-[:checked]:border-amber-500 transition">
+                                    <input type="radio" name="${itemId}" value="Qtd Incorreta" class="sr-only"> Qtd Incorreta
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Alternar Visões
+        function switchView(view) {
+            const formSec = document.getElementById('viewForm');
+            const adminSec = document.getElementById('viewAdmin');
+            const btnForm = document.getElementById('btnForm');
+            const btnAdmin = document.getElementById('btnAdmin');
+
+            if (view === 'form') {
+                formSec.classList.remove('hidden');
+                adminSec.classList.add('hidden');
+                btnForm.className = "bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1 shadow-inner";
+                btnAdmin.className = "bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1";
+            } else {
+                formSec.classList.add('hidden');
+                adminSec.classList.remove('hidden');
+                btnAdmin.className = "bg-blue-700 hover:bg-blue-600 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1 shadow-inner";
+                btnForm.className = "bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center space-x-1";
+                loadAdminData();
+            }
+        }
+
+        // Enviar Checklist
+        async function submitChecklist() {
+            const viatura = document.getElementById('viatura').value;
+            const profissional = document.getElementById('profissional').value.trim();
+            const turno = document.getElementById('turno').value;
+
+            if (!profissional) {
+                alert("Por favor, preencha o nome do Profissional responsável.");
+                document.getElementById('profissional').focus();
+                return;
+            }
+
+            let itensPendentes = [];
+            checklistData.forEach((cat, catIdx) => {
+                cat.itens.forEach((item, itemIdx) => {
+                    const itemId = `cat_${catIdx}_item_${itemIdx}`;
+                    const selected = document.querySelector(`input[name="${itemId}"]:checked`).value;
+                    if (selected !== "OK") {
+                        itensPendentes.push({ categoria: cat.categoria, item: item, status: selected });
+                    }
+                });
+            });
+
+            const registro = {
+                id: Date.now(),
+                dataHora: new Date().toLocaleString('pt-BR'),
+                viatura,
+                profissional,
+                turno,
+                statusGeral: itensPendentes.length === 0 ? "Tudo Certo" : "Com Pendências",
+                pendencias: itensPendentes
+            };
+
+            // Salvar localmente no navegador
+            let historico = JSON.parse(localStorage.getItem('samu_checklists') || '[]');
+            historico.unshift(registro);
+            localStorage.setItem('samu_checklists', JSON.stringify(historico));
+
+            // Enviar para o Google Sheets se a URL estiver configurada
+            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "COLE_AQUI_A_URL_DO_WEB_APP_DO_GOOGLE") {
+                const btn = document.getElementById('btnSubmit');
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Enviando para a Planilha...`;
+                
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(registro)
+                    });
+                } catch (e) {
+                    console.error("Erro ao enviar para o Google Sheets:", e);
+                }
+                
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>Enviar Checklist para a Central</span>`;
+            }
+
+            alert("Checklist enviado com sucesso!");
+            document.getElementById('profissional').value = '';
+            renderForm();
+            switchView('admin');
+        }
+
+        // Carregar Painel Local
+        function loadAdminData() {
+            const historico = JSON.parse(localStorage.getItem('samu_checklists') || '[]');
+            const adminList = document.getElementById('adminList');
+            
+            document.getElementById('statTotal').innerText = historico.length;
+            const comPendencias = historico.filter(h => h.statusGeral === "Com Pendências").length;
+            document.getElementById('statPendencias').innerText = comPendencias;
+            document.getElementById('statStatus').innerText = comPendencias === 0 ? "Regular" : "Atenção Necessária";
+            document.getElementById('statStatus').className = comPendencias === 0 ? "text-lg font-bold text-green-600" : "text-lg font-bold text-red-600";
+
+            if (historico.length === 0) {
+                adminList.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">Nenhum checklist enviado neste aparelho ainda.</div>`;
+                return;
+            }
+
+            let html = '';
+            historico.forEach(h => {
+                const badgeColor = h.statusGeral === "Tudo Certo" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
+                
+                html += `
+                    <div class="p-4 hover:bg-slate-50 transition">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-slate-800 text-base">${h.viatura}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${badgeColor}">${h.statusGeral}</span>
+                                <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">${h.turno}</span>
+                            </div>
+                            <span class="text-xs text-slate-400 mt-1 sm:mt-0"><i class="fa-regular fa-clock mr-1"></i>${h.dataHora}</span>
+                        </div>
+                        <div class="text-xs text-slate-600 mb-2">
+                            <span><strong>Responsável:</strong> ${h.profissional}</span>
+                        </div>
+                `;
+
+                if (h.pendencias.length > 0) {
+                    html += `<div class="mt-2 bg-red-50 border border-red-200 rounded-lg p-3 space-y-1">
+                                <p class="text-xs font-bold text-red-800 uppercase mb-1"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Itens que precisam de reposição:</p>`;
+                    h.pendencias.forEach(p => {
+                        html += `<div class="text-xs text-red-700 flex justify-between">
+                                    <span>• [${p.categoria}] ${p.item}</span>
+                                    <span class="font-bold uppercase">${p.status}</span>
+                                 </div>`;
+                    });
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            });
+
+            adminList.innerHTML = html;
+        }
+
+        function clearHistory() {
+            if (confirm("Deseja realmente limpar o histórico deste aparelho?")) {
+                localStorage.removeItem('samu_checklists');
+                loadAdminData();
+            }
+        }
+
+        window.onload = () => { renderForm(); };
+    </script>
+</body>
+</html>
