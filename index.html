@@ -140,7 +140,7 @@
 
     <!-- Script da Aplicação -->
     <script>
-        // URL DO GOOGLE APPS SCRIPT (Cole sua URL gerada no passo 2 aqui embaixo)
+        // URL DO GOOGLE APPS SCRIPT
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOoc9ITf4OFLrN6X9x5oRCocB4dS4EYR62ha0eiA89w0aosyxFjOfC8B0XJVA3cVa9/exec";
 
         // Estrutura completa baseada no Checklist Beta oficial
@@ -180,7 +180,6 @@
             {
                 categoria: "Gavetas",
                 itens: [
-             
                     "Água Destilada - ampola (4 un)",
                     "Dipirona - ampola (3 un)",
                     "Glicose 25% ou 50% - ampola (8 un)",
@@ -194,10 +193,10 @@
                     "Seringas 10ml (3 un)",
                     "Seringas 20ml (3 un)",
                     "Agulhas 40X12 (5 un)",
-                    "Agulhas 25X8  (5 un)",
+                    "Agulhas 25X8 (5 un)",
                     "Agulhas 30X7 (5 un)",
-                    "Scalp nº 25(2 un)",
-                     "Scalp nº 27 (2 un)",
+                    "Scalp nº 25 (2 un)",
+                    "Scalp nº 27 (2 un)",
                     "Abocath nº 14 (3 un)",
                     "Abocath nº 16 (3 un)",
                     "Abocath nº 18 (3 un)",
@@ -208,8 +207,6 @@
                     "Garrote (2 un)",
                     "Termômetro Digital (1 un)",
                     "Esparadrapo Estreito e Largo (1 un)"
-                  
-                    
                 ]
             },
             {
@@ -219,10 +216,8 @@
                     "1 saco de lixo (1 un)",
                     "2 chumaço",
                     "2 gaze"
-                    
                 ]
             },
-           
             {
                 categoria: "Mochila de Vias Aéreas",
                 itens: [
@@ -230,7 +225,7 @@
                     "Frasco Aspirador com Extensão (1 un)",
                     "Umidificador com Máscara Adulto e Infantil (1 un)",
                     "Respirador Manual (Ambu) Adulto e Infantil (1 un)",
-                    "Cânula Guedel nº 0(1 un)",
+                    "Cânula Guedel nº 0 (1 un)",
                     "Cânula Guedel nº 1 (1 un)",
                     "Cânula Guedel nº 2 (1 un)",
                     "Cânula Guedel nº 3 (1 un)",
@@ -239,11 +234,11 @@
                     "Abaixador de Língua (5 un)",
                     "Sonda de Aspiração nº 4 (1 un)",
                     "Sonda de Aspiração nº 6 (1 un)",
-                      "Sonda de Aspiração nº 8 (1 un)",
+                    "Sonda de Aspiração nº 8 (1 un)",
                     "Sonda de Aspiração nº 10 (1 un)",
                     "Sonda de Aspiração nº 12 (1 un)",
                     "Sonda de Aspiração nº 14 (1 un)",
-                    "Sonda de Aspiração nº 16 (1 un)",
+                    "Sonda de Aspiração nº 16 (1 un)"
                 ]
             },
             {
@@ -255,17 +250,17 @@
                     "Talhas p (4 un)",
                     "Bandagem Triangular (10 un)",
                     "Atadura Crepe 20cm (10 un)",
-                     "Atadura Crepe 10cm (6 un)",
-                    "Chumaço (5 un)", 
-                    "Mantas Térmicas (2 un)
+                    "Atadura Crepe 10cm (6 un)",
+                    "Chumaço (5 un)",
+                    "Mantas Térmicas (2 un)"
                 ]
             },
             {
                 categoria: "Mochila Beta (Procedimentos / Parto)",
                 itens: [
                     "Bandagem Triangular (3 un)",
-                     "Gaze (5 un)",
-                     "Chumaço (2 un)",
+                    "Gaze (5 un)",
+                    "Chumaço (2 un)",
                     "Ataduras 10cm (3 un)",
                     "Ataduras 20cm (2 un)",
                     "Máscaras Cirúrgicas (6 un)",
@@ -274,10 +269,10 @@
                     "Seringas 10ml (2 un)",
                     "Seringas 20ml (2 un)",
                     "Agulhas 40X12 (2 un)",
-                    "Agulhas 25X8  (2 un)",
+                    "Agulhas 25X8 (2 un)",
                     "Agulhas 30X7 (2 un)",
-                    "Scalp nº 25(2 un)",
-                     "Scalp nº 27 (2 un)",
+                    "Scalp nº 25 (2 un)",
+                    "Scalp nº 27 (2 un)",
                     "Abocath nº 14 (2 un)",
                     "Abocath nº 16 (2 un)",
                     "Abocath nº 18 (2 un)",
@@ -289,14 +284,12 @@
                     "SG 250 mL (1 un)",
                     "Garrote (2 un)",
                     "Termômetro Digital (1 un)",
-                    "Esparadrapo Estreito e Largo (1 un)"
+                    "Esparadrapo Estreito e Largo (1 un)",
                     "Abocath 14 ao 24 (2 un) / Esparadrapo P (1 un)",
                     "Glicose 25% e 50% (8 ampolas)",
                     "Glicosímetro , Tubo de Fita Reagente / Agulhas / Algodão",
                     "Esfigmomanômetro e Estetoscópio Adulto",
                     "Oximetro"
-                    
-                    
                 ]
             }
         ];
@@ -419,7 +412,7 @@
                 }
                 
                 btn.disabled = false;
-                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>Enviar Checklist para a Central</span>`;
+                btn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>Enviar Checklist</span>`;
             }
 
             alert("Checklist enviado com sucesso!");
