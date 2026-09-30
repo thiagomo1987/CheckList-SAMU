@@ -87,13 +87,22 @@
                 <!-- Preenchido via JavaScript -->
             </div>
 
-            <!-- Campo de Foto Opcional -->
+            <!-- Campo de Foto Opcional com Preview -->
             <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
                 <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center">
                     <i class="fa-solid fa-camera text-blue-600 mr-2"></i> Registro Fotográfico / Ocorrência (Opcional)
                 </h3>
-                <input type="file" id="fotoOcorrencia" accept="image/*" capture="environment" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-lg p-2">
+                <input type="file" id="fotoOcorrencia" accept="image/*" capture="environment" onchange="handleImageSelect(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-lg p-2">
                 <p class="text-xs text-slate-400 mt-1">Tire uma foto caso haja avarias, lacres rompidos ou itens críticos.</p>
+                
+                <!-- Área da Miniatura da Foto -->
+                <div id="previewArea" class="mt-3 hidden flex items-center space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <img id="imgPreview" class="w-16 h-16 object-cover rounded-lg border border-slate-300">
+                    <div>
+                        <p class="text-xs font-bold text-green-700"><i class="fa-solid fa-circle-check mr-1"></i> Foto pronta para envio!</p>
+                        <button type="button" onclick="removePhoto()" class="text-xs text-red-600 hover:text-red-800 font-semibold mt-1 underline"><i class="fa-solid fa-trash mr-1"></i> Remover foto</button>
+                    </div>
+                </div>
             </div>
 
             <div class="pt-4 pb-12 flex justify-end">
@@ -145,13 +154,16 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.7
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.8
     </footer>
 
     <!-- Script da Aplicação -->
     <script>
         // URL DO GOOGLE APPS SCRIPT
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOoc9ITf4OFLrN6X9x5oRCocB4dS4EYR62ha0eiA89w0aosyxFjOfC8B0XJVA3cVa9/exec";
+
+        let compressedPhotoBase64 = "";
+        let compressedPhotoName = "";
 
         // Estrutura completa baseada no Checklist Beta oficial
         const checklistData = [
@@ -418,50 +430,52 @@
             }
         }
 
-        // Comprimir imagem com tratamento de erro e feedback
-        function compressImage(file) {
-            return new Promise((resolve, reject) => {
+        // Processar imagem e exibir pré-visualização instantânea na tela
+        function handleImageSelect(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                compressedPhotoName = file.name;
+
                 const reader = new FileReader();
-                reader.onload = (event) => {
+                reader.onload = (e) => {
                     const img = new Image();
                     img.onload = () => {
-                        try {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            
-                            const MAX_WIDTH = 400;
-                            const MAX_HEIGHT = 400;
-                            
-                            if (width > height) {
-                                if (width > MAX_WIDTH) {
-                                    height *= MAX_WIDTH / width;
-                                    width = MAX_WIDTH;
-                                }
-                            } else {
-                                if (height > MAX_HEIGHT) {
-                                    width *= MAX_HEIGHT / height;
-                                    height = MAX_HEIGHT;
-                                }
-                            }
-                            
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
-                            resolve(dataUrl);
-                        } catch (err) {
-                            reject(err);
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        const MAX_WIDTH = 400;
+                        const MAX_HEIGHT = 400;
+                        
+                        if (width > height) {
+                            if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        } else {
+                            if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
                         }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.4);
+                        
+                        // Mostra a miniatura na tela para o usuário confirmar
+                        document.getElementById('imgPreview').src = compressedPhotoBase64;
+                        document.getElementById('previewArea').classList.remove('hidden');
                     };
-                    img.onerror = (err) => reject(err);
-                    img.src = event.target.result;
+                    img.src = e.target.result;
                 };
-                reader.onerror = (err) => reject(err);
                 reader.readAsDataURL(file);
-            });
+            }
+        }
+
+        // Remover foto anexada
+        function removePhoto() {
+            document.getElementById('fotoOcorrencia').value = '';
+            document.getElementById('previewArea').classList.add('hidden');
+            compressedPhotoBase64 = "";
+            compressedPhotoName = "";
         }
 
         // Alternar Visões
@@ -490,7 +504,6 @@
             const viatura = document.getElementById('viatura').value;
             const profissional = document.getElementById('profissional').value.trim();
             const turno = document.getElementById('turno').value;
-            const fileInput = document.getElementById('fotoOcorrencia');
 
             if (!profissional) {
                 alert("Por favor, preencha o nome do Profissional responsável.");
@@ -509,20 +522,6 @@
                 });
             });
 
-            let fotoBase64 = "";
-            let fotoNome = "";
-            if (fileInput.files && fileInput.files[0]) {
-                try {
-                    const file = fileInput.files[0];
-                    fotoNome = file.name;
-                    fotoBase64 = await compressImage(file);
-                    console.log("Foto processada com sucesso. Tamanho string:", fotoBase64.length);
-                } catch (e) {
-                    console.error("Erro ao processar imagem:", e);
-                    alert("Atenção: Houve um erro ao processar a foto, mas o checklist será enviado sem ela.");
-                }
-            }
-
             const registro = {
                 id: Date.now(),
                 dataHora: new Date().toLocaleString('pt-BR'),
@@ -531,8 +530,8 @@
                 turno,
                 statusGeral: itensPendentes.length === 0 ? "Tudo Certo" : "Com Pendências",
                 pendencias: itensPendentes,
-                foto: fotoBase64,
-                fotoNome: fotoNome
+                foto: compressedPhotoBase64,
+                fotoNome: compressedPhotoName
             };
 
             // Salvar localmente
@@ -565,7 +564,7 @@
 
             alert("Checklist enviado com sucesso!");
             document.getElementById('profissional').value = '';
-            fileInput.value = '';
+            removePhoto();
             const indicator = document.getElementById('draftIndicator');
             if (indicator) indicator.classList.add('hidden');
             
@@ -621,7 +620,7 @@
                 }
 
                 if (h.foto) {
-                    html += `<div class="mt-2 text-xs text-blue-600"><i class="fa-solid fa-camera mr-1"></i> Foto anexada no envio.</div>`;
+                    html += `<div class="mt-2 text-xs text-blue-600 flex items-center"><i class="fa-solid fa-camera mr-1"></i> Foto anexada no envio.</div>`;
                 }
 
                 html += `</div>`;
