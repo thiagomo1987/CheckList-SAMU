@@ -145,7 +145,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.2
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.3
     </footer>
 
     <!-- Script da Aplicação -->
@@ -500,7 +500,7 @@
 
             localStorage.removeItem('samu_draft');
 
-            // Enviar para o Google Sheets
+            // Enviar para o Google Sheets via POST seguro
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "COLE_AQUI_A_URL_DO_WEB_APP_DO_GOOGLE") {
                 const btn = document.getElementById('btnSubmit');
                 btn.disabled = true;
@@ -509,8 +509,6 @@
                 try {
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(registro)
                     });
                 } catch (e) {
