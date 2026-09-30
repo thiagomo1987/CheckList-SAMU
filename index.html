@@ -154,13 +154,13 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.8
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.9
     </footer>
 
     <!-- Script da Aplicação -->
     <script>
-        // URL DO GOOGLE APPS SCRIPT
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOoc9ITf4OFLrN6X9x5oRCocB4dS4EYR62ha0eiA89w0aosyxFjOfC8B0XJVA3cVa9/exec";
+        // URL DO GOOGLE APPS SCRIPT ATUALIZADA
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwZ9Koa2V3_3WyU43Eqm2vynQkRWZyN9VnSq-sa9Dp16QA1i1TtX8hOdHaTTJTkXozC/exec";
 
         let compressedPhotoBase64 = "";
         let compressedPhotoName = "";
@@ -538,21 +538,21 @@
             let historico = JSON.parse(localStorage.getItem('samu_checklists') || '[]');
             historico.unshift(registro);
             localStorage.setItem('samu_checklists', JSON.stringify(historico));
-
             localStorage.removeItem('samu_draft');
 
-            // Enviar para o Google Sheets
-            if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "COLE_AQUI_A_URL_DO_WEB_APP_DO_GOOGLE") {
+            // Enviar para o Google Sheets via URL Encoded
+            if (GOOGLE_SCRIPT_URL) {
                 const btn = document.getElementById('btnSubmit');
                 btn.disabled = true;
                 btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Enviando para a Planilha e Drive...`;
                 
                 try {
+                    const formData = new URLSearchParams();
+                    formData.append("data", JSON.stringify(registro));
+
                     await fetch(GOOGLE_SCRIPT_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
-                        body: JSON.stringify(registro)
+                        body: formData
                     });
                 } catch (e) {
                     console.error("Erro ao enviar para o Google Sheets:", e);
