@@ -145,7 +145,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.5
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.6
     </footer>
 
     <!-- Script da Aplicação -->
@@ -418,7 +418,7 @@
             }
         }
 
-        // Comprimir imagem automaticamente para envio leve
+        // Comprimir imagem para tamanho ultra-leve (perfeito para o limite do Google)
         function compressImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -429,8 +429,8 @@
                         let width = img.width;
                         let height = img.height;
                         
-                        const MAX_WIDTH = 800;
-                        const MAX_HEIGHT = 800;
+                        const MAX_WIDTH = 400;
+                        const MAX_HEIGHT = 400;
                         
                         if (width > height) {
                             if (width > MAX_WIDTH) {
@@ -449,8 +449,8 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Compacta em JPEG com qualidade 0.7 (perfeito e leve)
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        // Qualidade 0.4 garante arquivo super leve (< 25KB)
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
                         resolve(dataUrl);
                     };
                     img.src = event.target.result;
@@ -509,7 +509,7 @@
             if (fileInput.files && fileInput.files[0]) {
                 const file = fileInput.files[0];
                 fotoNome = file.name;
-                fotoBase64 = await compressImage(file); // Comprime a foto antes de enviar
+                fotoBase64 = await compressImage(file);
             }
 
             const registro = {
