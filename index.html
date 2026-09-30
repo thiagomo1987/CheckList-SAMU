@@ -145,7 +145,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.6
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.7
     </footer>
 
     <!-- Script da Aplicação -->
@@ -418,43 +418,48 @@
             }
         }
 
-        // Comprimir imagem para tamanho ultra-leve (perfeito para o limite do Google)
+        // Comprimir imagem com tratamento de erro e feedback
         function compressImage(file) {
-            return new Promise((resolve) => {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
                     img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        
-                        const MAX_WIDTH = 400;
-                        const MAX_HEIGHT = 400;
-                        
-                        if (width > height) {
-                            if (width > MAX_WIDTH) {
-                                height *= MAX_WIDTH / width;
-                                width = MAX_WIDTH;
+                        try {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            
+                            const MAX_WIDTH = 400;
+                            const MAX_HEIGHT = 400;
+                            
+                            if (width > height) {
+                                if (width > MAX_WIDTH) {
+                                    height *= MAX_WIDTH / width;
+                                    width = MAX_WIDTH;
+                                }
+                            } else {
+                                if (height > MAX_HEIGHT) {
+                                    width *= MAX_HEIGHT / height;
+                                    height = MAX_HEIGHT;
+                                }
                             }
-                        } else {
-                            if (height > MAX_HEIGHT) {
-                                width *= MAX_HEIGHT / height;
-                                height = MAX_HEIGHT;
-                            }
+                            
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
+                            resolve(dataUrl);
+                        } catch (err) {
+                            reject(err);
                         }
-                        
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        
-                        // Qualidade 0.4 garante arquivo super leve (< 25KB)
-                        const dataUrl = canvas.toDataURL('image/jpeg', 0.4);
-                        resolve(dataUrl);
                     };
+                    img.onerror = (err) => reject(err);
                     img.src = event.target.result;
                 };
+                reader.onerror = (err) => reject(err);
                 reader.readAsDataURL(file);
             });
         }
@@ -507,9 +512,15 @@
             let fotoBase64 = "";
             let fotoNome = "";
             if (fileInput.files && fileInput.files[0]) {
-                const file = fileInput.files[0];
-                fotoNome = file.name;
-                fotoBase64 = await compressImage(file);
+                try {
+                    const file = fileInput.files[0];
+                    fotoNome = file.name;
+                    fotoBase64 = await compressImage(file);
+                    console.log("Foto processada com sucesso. Tamanho string:", fotoBase64.length);
+                } catch (e) {
+                    console.error("Erro ao processar imagem:", e);
+                    alert("Atenção: Houve um erro ao processar a foto, mas o checklist será enviado sem ela.");
+                }
             }
 
             const registro = {
