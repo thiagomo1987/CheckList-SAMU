@@ -40,14 +40,19 @@
         <!-- VIEW 1: FORMULÁRIO DE CHECKLIST -->
         <section id="viewForm" class="space-y-6">
             <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
-                <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
-                    <i class="fa-solid fa-file-pen text-blue-600 mr-2"></i> Identificação da Viatura e Turno
-                </h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-slate-900 flex items-center">
+                        <i class="fa-solid fa-file-pen text-blue-600 mr-2"></i> Identificação da Viatura e Turno
+                    </h2>
+                    <span id="draftIndicator" class="text-xs bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full font-semibold hidden">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Rascunho Recuperado
+                    </span>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Viatura / Base</label>
-                        <select id="viatura" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                                <optgroup label="Suporte Básico (Beta)">
+                        <select id="viatura" onchange="saveDraft()" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <optgroup label="Suporte Básico (Beta)">
                                 <option value="Beta 1">Beta 1</option>
                                 <option value="Beta 2">Beta 2</option>
                                 <option value="Beta 3">Beta 3</option>
@@ -65,11 +70,11 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Profissional Responsável</label>
-                        <input type="text" id="profissional" placeholder="Seu Nome / Matrícula" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" id="profissional" oninput="saveDraft()" placeholder="Seu Nome / Matrícula" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Turno</label>
-                        <select id="turno" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <select id="turno" onchange="saveDraft()" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                             <option value="07h às 19h">07h às 19h (Diurno)</option>
                             <option value="19h às 07h">19h às 07h (Noturno)</option>
                         </select>
@@ -131,7 +136,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.0
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.1
     </footer>
 
     <!-- Script da Aplicação -->
@@ -172,8 +177,8 @@
                     "Almotolia de Alcool 70% (Cheio)",
                     "Caixa de perfuro cortante",
                     "Kit Algodão",
-                     "Esfigmo Obeso (1 un)",
-                     "Esfigmo Infantil (1 un)",
+                    "Esfigmo Obeso (1 un)",
+                    "Esfigmo Infantil (1 un)",
                     "Respirador manual adulto (1 uni)",
                     "Respirador manual infantil (1 uni)",
                     "DEA com Pas conectadas"
@@ -191,7 +196,7 @@
                     "Aerolin (1 un)",
                     "Espaçador adulto (1 un)",
                     "Espaçador Infantil (1 un)",
-                     "Agulhas 25X8 (2 un)",
+                    "Agulhas 25X8 (2 un)",
                     "Agulhas 30X7 (2 un)",
                     "Tubo de Fita Dextro (1 un)",
                     "Lancetas reservas",
@@ -213,25 +218,23 @@
                     "Abocath nº 24 (3 un)",
                     "Equipos Macrogotas (3 un)",
                     "Garrote (2 un)",
-                     "Mascara de procedimento (5 un)",
+                    "Mascara de procedimento (5 un)",
                     "Esparadrapo Estreito e Largo (1 un)"
                 ]
             },
-
-             {
+            {
                 categoria: "Bau Banco e viatura",
                 itens: [
                     "Cobertor em saco plastico (1 un)",
                     "Lençol de tecido (4 un)",
                     "Lençol descartavel",
-                    "Tirante reserva (3 un)" ,
+                    "Tirante reserva (3 un)",
                     "Saco de lixo branco(2 un)",
                     "Lona de transferencia (1 un)",
-                    "Pano de chão (2 un)" ,
+                    "Pano de chão (2 un)",
                     "Desinfectante (1 un)",
                     "Produto para Antissepesia (1 borrifador)",
                     "Prancha rígida com base de HeadBlock (2 un)"
-                    
                 ]
             },
             {
@@ -241,8 +244,8 @@
                     "1 saco de lixo (1 un)",
                     "2 chumaço",
                     "2 gaze",
-                    "Luva Esteril 7,0 ",
-                    "Luva Esteril 8,0 "
+                    "Luva Esteril 7,0",
+                    "Luva Esteril 8,0"
                 ]
             },
             {
@@ -302,7 +305,7 @@
                     "Abocath nº 24 (3 un)",
                     "Equipos Macrogotas (2 un)",
                     "SG 250 mL (1 un)",
-                     "SF 250 mL (1 un)",
+                    "SF 250 mL (1 un)",
                     "Garrote (2 un)",
                     "Termômetro Digital (1 un)",
                     "Esparadrapo Largo (1 un)",
@@ -339,13 +342,13 @@
                             <span class="text-sm font-medium text-slate-700">${item}</span>
                             <div class="flex items-center space-x-2">
                                 <label class="inline-flex items-center cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-green-50 has-[:checked]:bg-green-600 has-[:checked]:text-white has-[:checked]:border-green-600 transition">
-                                    <input type="radio" name="${itemId}" value="OK" checked class="sr-only"> OK
+                                    <input type="radio" name="${itemId}" value="OK" checked onchange="saveDraft()" class="sr-only"> OK
                                 </label>
                                 <label class="inline-flex items-center cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-red-50 has-[:checked]:bg-red-600 has-[:checked]:text-white has-[:checked]:border-red-600 transition">
-                                    <input type="radio" name="${itemId}" value="Em Falta" class="sr-only"> Em Falta
+                                    <input type="radio" name="${itemId}" value="Em Falta" onchange="saveDraft()" class="sr-only"> Em Falta
                                 </label>
                                 <label class="inline-flex items-center cursor-pointer text-xs font-medium px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-amber-50 has-[:checked]:bg-amber-500 has-[:checked]:text-white has-[:checked]:border-amber-500 transition">
-                                    <input type="radio" name="${itemId}" value="Qtd Incorreta" class="sr-only"> Qtd Incorreta
+                                    <input type="radio" name="${itemId}" value="Qtd Incorreta" onchange="saveDraft()" class="sr-only"> Qtd Incorreta
                                 </label>
                             </div>
                         </div>
@@ -356,6 +359,55 @@
             });
 
             container.innerHTML = html;
+            loadDraft(); // Carrega o rascunho salvo ao abrir
+        }
+
+        // Salvar Rascunho Automaticamente
+        function saveDraft() {
+            const draft = {
+                viatura: document.getElementById('viatura').value,
+                profissional: document.getElementById('profissional').value,
+                turno: document.getElementById('turno').value,
+                respostas: {}
+            };
+
+            checklistData.forEach((cat, catIdx) => {
+                cat.itens.forEach((item, itemIdx) => {
+                    const itemId = `cat_${catIdx}_item_${itemIdx}`;
+                    const selected = document.querySelector(`input[name="${itemId}"]:checked`);
+                    if (selected) {
+                        draft.respostas[itemId] = selected.value;
+                    }
+                });
+            });
+
+            localStorage.setItem('samu_draft', JSON.stringify(draft));
+        }
+
+        // Carregar Rascunho Salvo
+        function loadDraft() {
+            const savedDraft = localStorage.getItem('samu_draft');
+            if (!savedDraft) return;
+
+            try {
+                const draft = JSON.parse(savedDraft);
+                if (draft.viatura) document.getElementById('viatura').value = draft.viatura;
+                if (draft.profissional) document.getElementById('profissional').value = draft.profissional;
+                if (draft.turno) document.getElementById('turno').value = draft.turno;
+
+                if (draft.respostas) {
+                    for (const [itemId, value] of Object.entries(draft.respostas)) {
+                        const radio = document.querySelector(`input[name="${itemId}"][value="${value}"]`);
+                        if (radio) radio.checked = true;
+                    }
+                }
+
+                // Exibe o aviso de rascunho recuperado
+                const indicator = document.getElementById('draftIndicator');
+                if (indicator) indicator.classList.remove('hidden');
+            } catch (e) {
+                console.error("Erro ao carregar rascunho", e);
+            }
         }
 
         // Alternar Visões
@@ -412,10 +464,13 @@
                 pendencias: itensPendentes
             };
 
-            // Salvar localmente no navegador
+            // Salvar localmente no histórico
             let historico = JSON.parse(localStorage.getItem('samu_checklists') || '[]');
             historico.unshift(registro);
             localStorage.setItem('samu_checklists', JSON.stringify(historico));
+
+            // Limpa o rascunho após o envio bem-sucedido
+            localStorage.removeItem('samu_draft');
 
             // Enviar para o Google Sheets se a URL estiver configurada
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "COLE_AQUI_A_URL_DO_WEB_APP_DO_GOOGLE") {
@@ -440,6 +495,9 @@
 
             alert("Checklist enviado com sucesso!");
             document.getElementById('profissional').value = '';
+            const indicator = document.getElementById('draftIndicator');
+            if (indicator) indicator.classList.add('hidden');
+            
             renderForm();
             switchView('admin');
         }
