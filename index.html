@@ -87,6 +87,15 @@
                 <!-- Preenchido via JavaScript -->
             </div>
 
+            <!-- Campo de Foto Opcional -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
+                <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center">
+                    <i class="fa-solid fa-camera text-blue-600 mr-2"></i> Registro Fotográfico / Ocorrência (Opcional)
+                </h3>
+                <input type="file" id="fotoOcorrencia" accept="image/*" capture="environment" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-lg p-2">
+                <p class="text-xs text-slate-400 mt-1">Tire uma foto caso haja avarias, lacres rompidos ou itens críticos.</p>
+            </div>
+
             <div class="pt-4 pb-12 flex justify-end">
                 <button onclick="submitChecklist()" id="btnSubmit" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition flex items-center space-x-2 text-base w-full sm:w-auto justify-center">
                     <i class="fa-solid fa-paper-plane"></i>
@@ -136,7 +145,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.1
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.2
     </footer>
 
     <!-- Script da Aplicação -->
@@ -359,10 +368,10 @@
             });
 
             container.innerHTML = html;
-            loadDraft(); // Carrega o rascunho salvo ao abrir
+            loadDraft();
         }
 
-        // Salvar Rascunho Automaticamente
+        // Salvar Rascunho
         function saveDraft() {
             const draft = {
                 viatura: document.getElementById('viatura').value,
@@ -384,7 +393,7 @@
             localStorage.setItem('samu_draft', JSON.stringify(draft));
         }
 
-        // Carregar Rascunho Salvo
+        // Carregar Rascunho
         function loadDraft() {
             const savedDraft = localStorage.getItem('samu_draft');
             if (!savedDraft) return;
@@ -402,12 +411,21 @@
                     }
                 }
 
-                // Exibe o aviso de rascunho recuperado
                 const indicator = document.getElementById('draftIndicator');
                 if (indicator) indicator.classList.remove('hidden');
             } catch (e) {
                 console.error("Erro ao carregar rascunho", e);
             }
+        }
+
+        // Converter arquivo em Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
         }
 
         // Alternar Visões
@@ -436,6 +454,7 @@
             const viatura = document.getElementById('viatura').value;
             const profissional = document.getElementById('profissional').value.trim();
             const turno = document.getElementById('turno').value;
+            const fileInput = document.getElementById('fotoOcorrencia');
 
             if (!profissional) {
                 alert("Por favor, preencha o nome do Profissional responsável.");
@@ -454,6 +473,14 @@
                 });
             });
 
+            let fotoBase64 = "";
+            let fotoNome = "";
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                fotoNome = file.name;
+                fotoBase64 = await fileToBase64(file);
+            }
+
             const registro = {
                 id: Date.now(),
                 dataHora: new Date().toLocaleString('pt-BR'),
@@ -461,22 +488,23 @@
                 profissional,
                 turno,
                 statusGeral: itensPendentes.length === 0 ? "Tudo Certo" : "Com Pendências",
-                pendencias: itensPendentes
+                pendencias: itensPendentes,
+                foto: fotoBase64,
+                fotoNome: fotoNome
             };
 
-            // Salvar localmente no histórico
+            // Salvar localmente
             let historico = JSON.parse(localStorage.getItem('samu_checklists') || '[]');
             historico.unshift(registro);
             localStorage.setItem('samu_checklists', JSON.stringify(historico));
 
-            // Limpa o rascunho após o envio bem-sucedido
             localStorage.removeItem('samu_draft');
 
-            // Enviar para o Google Sheets se a URL estiver configurada
+            // Enviar para o Google Sheets
             if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "COLE_AQUI_A_URL_DO_WEB_APP_DO_GOOGLE") {
                 const btn = document.getElementById('btnSubmit');
                 btn.disabled = true;
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Enviando para a Planilha...`;
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Enviando para a Planilha e Drive...`;
                 
                 try {
                     await fetch(GOOGLE_SCRIPT_URL, {
@@ -495,6 +523,7 @@
 
             alert("Checklist enviado com sucesso!");
             document.getElementById('profissional').value = '';
+            fileInput.value = '';
             const indicator = document.getElementById('draftIndicator');
             if (indicator) indicator.classList.add('hidden');
             
@@ -547,6 +576,10 @@
                                  </div>`;
                     });
                     html += `</div>`;
+                }
+
+                if (h.foto) {
+                    html += `<div class="mt-2 text-xs text-blue-600"><i class="fa-solid fa-camera mr-1"></i> Foto anexada no envio.</div>`;
                 }
 
                 html += `</div>`;
