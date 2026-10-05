@@ -87,7 +87,7 @@
                 <!-- Preenchido via JavaScript -->
             </div>
 
-            <!-- Campo de Foto Opcional com Preview -->
+            <!-- Campo de Foto Opcional com Preview e Comentário -->
             <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
                 <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center">
                     <i class="fa-solid fa-camera text-blue-600 mr-2"></i> Registro Fotográfico / Ocorrência (Opcional)
@@ -95,6 +95,12 @@
                 <input type="file" id="fotoOcorrencia" accept="image/*" capture="environment" onchange="handleImageSelect(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-lg p-2">
                 <p class="text-xs text-slate-400 mt-1">Tire uma foto caso haja avarias, lacres rompidos ou itens críticos.</p>
                 
+                <!-- Campo de Comentário da Foto -->
+                <div id="commentArea" class="mt-3 hidden">
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Descrição / Comentário da Foto</label>
+                    <input type="text" id="fotoComentario" placeholder="Ex: Lacre rompido, avaria na porta lateral..." class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
                 <!-- Área da Miniatura da Foto -->
                 <div id="previewArea" class="mt-3 hidden flex items-center space-x-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
                     <img id="imgPreview" class="w-16 h-16 object-cover rounded-lg border border-slate-300">
@@ -154,7 +160,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v2.9
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v3.0
     </footer>
 
     <!-- Script da Aplicação -->
@@ -432,7 +438,7 @@
             }
         }
 
-        // Processar imagem e exibir pré-visualização instantânea na tela
+        // Processar imagem e exibir pré-visualização e campo de comentário
         function handleImageSelect(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -462,9 +468,10 @@
                         
                         compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.4);
                         
-                        // Mostra a miniatura na tela para o usuário confirmar
+                        // Mostra a miniatura e o campo de comentário na tela
                         document.getElementById('imgPreview').src = compressedPhotoBase64;
                         document.getElementById('previewArea').classList.remove('hidden');
+                        document.getElementById('commentArea').classList.remove('hidden');
                     };
                     img.src = e.target.result;
                 };
@@ -472,10 +479,12 @@
             }
         }
 
-        // Remover foto anexada
+        // Remover foto anexada e limpar comentário
         function removePhoto() {
             document.getElementById('fotoOcorrencia').value = '';
+            document.getElementById('fotoComentario').value = '';
             document.getElementById('previewArea').classList.add('hidden');
+            document.getElementById('commentArea').classList.add('hidden');
             compressedPhotoBase64 = "";
             compressedPhotoName = "";
         }
@@ -506,6 +515,7 @@
             const viatura = document.getElementById('viatura').value;
             const profissional = document.getElementById('profissional').value.trim();
             const turno = document.getElementById('turno').value;
+            const fotoComentario = document.getElementById('fotoComentario').value.trim();
 
             if (!profissional) {
                 alert("Por favor, preencha o nome do Profissional responsável.");
@@ -533,7 +543,8 @@
                 statusGeral: itensPendentes.length === 0 ? "Tudo Certo" : "Com Pendências",
                 pendencias: itensPendentes,
                 foto: compressedPhotoBase64,
-                fotoNome: compressedPhotoName
+                fotoNome: compressedPhotoName,
+                fotoComentario: fotoComentario
             };
 
             // Salvar localmente
@@ -622,7 +633,7 @@
                 }
 
                 if (h.foto) {
-                    html += `<div class="mt-2 text-xs text-blue-600 flex items-center"><i class="fa-solid fa-camera mr-1"></i> Foto anexada no envio.</div>`;
+                    html += `<div class="mt-2 text-xs text-blue-600"><i class="fa-solid fa-camera mr-1"></i> Foto anexada ${h.fotoComentario ? '- Obs: ' + h.fotoComentario : ''}</div>`;
                 }
 
                 html += `</div>`;
