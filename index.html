@@ -87,16 +87,16 @@
                 <!-- Preenchido via JavaScript -->
             </div>
 
-            <!-- Bloco de Observação e Registro Fotográfico (Sempre Disponível) -->
+            <!-- Bloco de Observação e Registro Fotográfico -->
             <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200 space-y-4">
                 <h3 class="text-sm font-bold text-slate-900 flex items-center">
                     <i class="fa-solid fa-clipboard-list text-blue-600 mr-2"></i> Observações e Registro Fotográfico (Opcional)
                 </h3>
                 
-                <!-- Campo de Comentário / Observação (Sempre Visível) -->
+                <!-- Campo de Comentário / Observação (Sempre Visível e Independente) -->
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Descrição / Comentário da Ocorrência</label>
-                    <input type="text" id="fotoComentario" placeholder="Ex: Lacre rompido, avaria na porta lateral, observação..." class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    <input type="text" id="fotoComentario" oninput="saveDraft()" placeholder="Ex: Lacre rompido, avaria na porta lateral, observação..." class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
 
                 <!-- Anexo de Foto -->
@@ -165,7 +165,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v3.1
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v3.2
     </footer>
 
     <!-- Script da Aplicação -->
@@ -485,7 +485,7 @@
             }
         }
 
-        // Remover foto anexada (mantém o comentário livre)
+        // Remover foto anexada (mantém o comentário intacto)
         function removePhoto() {
             document.getElementById('fotoOcorrencia').value = '';
             document.getElementById('previewArea').classList.add('hidden');
