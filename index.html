@@ -87,18 +87,23 @@
                 <!-- Preenchido via JavaScript -->
             </div>
 
-            <!-- Campo de Foto Opcional com Preview e Comentário -->
-            <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200">
-                <h3 class="text-sm font-bold text-slate-900 mb-2 flex items-center">
-                    <i class="fa-solid fa-camera text-blue-600 mr-2"></i> Registro Fotográfico / Ocorrência (Opcional)
+            <!-- Bloco de Observação e Registro Fotográfico (Sempre Disponível) -->
+            <div class="bg-white rounded-xl shadow-sm p-5 border border-slate-200 space-y-4">
+                <h3 class="text-sm font-bold text-slate-900 flex items-center">
+                    <i class="fa-solid fa-clipboard-list text-blue-600 mr-2"></i> Observações e Registro Fotográfico (Opcional)
                 </h3>
-                <input type="file" id="fotoOcorrencia" accept="image/*" capture="environment" onchange="handleImageSelect(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-lg p-2">
-                <p class="text-xs text-slate-400 mt-1">Tire uma foto caso haja avarias, lacres rompidos ou itens críticos.</p>
                 
-                <!-- Campo de Comentário da Foto -->
-                <div id="commentArea" class="mt-3 hidden">
-                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Descrição / Comentário da Foto</label>
-                    <input type="text" id="fotoComentario" placeholder="Ex: Lacre rompido, avaria na porta lateral..." class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <!-- Campo de Comentário / Observação (Sempre Visível) -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Descrição / Comentário da Ocorrência</label>
+                    <input type="text" id="fotoComentario" placeholder="Ex: Lacre rompido, avaria na porta lateral, observação..." class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <!-- Anexo de Foto -->
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Anexar Foto (Opcional)</label>
+                    <input type="file" id="fotoOcorrencia" accept="image/*" capture="environment" onchange="handleImageSelect(this)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer border border-slate-200 rounded-lg p-2">
+                    <p class="text-xs text-slate-400 mt-1">Tire uma foto caso haja avarias ou itens críticos.</p>
                 </div>
 
                 <!-- Área da Miniatura da Foto -->
@@ -160,7 +165,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v3.0
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v3.1
     </footer>
 
     <!-- Script da Aplicação -->
@@ -397,6 +402,7 @@
                 viatura: document.getElementById('viatura').value,
                 profissional: document.getElementById('profissional').value,
                 turno: document.getElementById('turno').value,
+                comentario: document.getElementById('fotoComentario').value,
                 respostas: {}
             };
 
@@ -423,6 +429,7 @@
                 if (draft.viatura) document.getElementById('viatura').value = draft.viatura;
                 if (draft.profissional) document.getElementById('profissional').value = draft.profissional;
                 if (draft.turno) document.getElementById('turno').value = draft.turno;
+                if (draft.comentario) document.getElementById('fotoComentario').value = draft.comentario;
 
                 if (draft.respostas) {
                     for (const [itemId, value] of Object.entries(draft.respostas)) {
@@ -438,7 +445,7 @@
             }
         }
 
-        // Processar imagem e exibir pré-visualização e campo de comentário
+        // Processar imagem e exibir pré-visualização instantânea
         function handleImageSelect(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
@@ -468,10 +475,9 @@
                         
                         compressedPhotoBase64 = canvas.toDataURL('image/jpeg', 0.4);
                         
-                        // Mostra a miniatura e o campo de comentário na tela
+                        // Mostra a miniatura na tela
                         document.getElementById('imgPreview').src = compressedPhotoBase64;
                         document.getElementById('previewArea').classList.remove('hidden');
-                        document.getElementById('commentArea').classList.remove('hidden');
                     };
                     img.src = e.target.result;
                 };
@@ -479,12 +485,10 @@
             }
         }
 
-        // Remover foto anexada e limpar comentário
+        // Remover foto anexada (mantém o comentário livre)
         function removePhoto() {
             document.getElementById('fotoOcorrencia').value = '';
-            document.getElementById('fotoComentario').value = '';
             document.getElementById('previewArea').classList.add('hidden');
-            document.getElementById('commentArea').classList.add('hidden');
             compressedPhotoBase64 = "";
             compressedPhotoName = "";
         }
@@ -577,6 +581,7 @@
 
             alert("Checklist enviado com sucesso!");
             document.getElementById('profissional').value = '';
+            document.getElementById('fotoComentario').value = '';
             removePhoto();
             const indicator = document.getElementById('draftIndicator');
             if (indicator) indicator.classList.add('hidden');
@@ -632,8 +637,12 @@
                     html += `</div>`;
                 }
 
+                if (h.fotoComentario && h.fotoComentario !== "Nenhum") {
+                    html += `<div class="mt-2 text-xs text-slate-700 bg-slate-100 p-2 rounded"><strong>Obs:</strong> ${h.fotoComentario}</div>`;
+                }
+
                 if (h.foto) {
-                    html += `<div class="mt-2 text-xs text-blue-600"><i class="fa-solid fa-camera mr-1"></i> Foto anexada ${h.fotoComentario ? '- Obs: ' + h.fotoComentario : ''}</div>`;
+                    html += `<div class="mt-2 text-xs text-blue-600 flex items-center"><i class="fa-solid fa-camera mr-1"></i> Foto anexada.</div>`;
                 }
 
                 html += `</div>`;
