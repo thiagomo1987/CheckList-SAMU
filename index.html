@@ -48,7 +48,7 @@
                         <i class="fa-solid fa-floppy-disk mr-1"></i> Rascunho Recuperado
                     </span>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Viatura / Base</label>
                         <select id="viatura" onchange="saveDraft()" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
@@ -70,9 +70,17 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Profissional Responsável</label>
-                        <input type="text" id="profissional" oninput="saveDraft()" placeholder="Seu Nome / Coren / Matrícula" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                        <input type="text" id="profissional" oninput="saveDraft()" placeholder="Nome Completo" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                     </div>
                     <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Coren-SP</label>
+                        <input type="text" id="coren" oninput="saveDraft()" placeholder="Ex: 000.000-ENF" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Matrícula</label>
+                        <input type="text" id="matricula" oninput="saveDraft()" placeholder="Nº da Matrícula" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div class="sm:col-span-2 md:col-span-1">
                         <label class="block text-xs font-semibold uppercase text-slate-500 mb-1">Turno</label>
                         <select id="turno" onchange="saveDraft()" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
                             <option value="07h às 19h">07h às 19h (Diurno)</option>
@@ -165,7 +173,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        SAMU 192 Sorocaba • Sistema de Checklist Operacional v3.2
+        SAMU 192 Sorocaba • Sistema de Checklist Operacional v3.3
     </footer>
 
     <!-- Script da Aplicação -->
@@ -240,7 +248,7 @@
                     "Agulhas 40X12 (5 un)",
                     "Agulhas 25X8 (5 un)",
                     "Agulhas 30X7 (2 un)",
-                     "Scalp nº 21 (2 un)",
+                    "Scalp nº 21 (2 un)",
                     "Scalp nº 23 (2 un)",
                     "Scalp nº 25 (2 un)",
                     "Scalp nº 27 (2 un)",
@@ -401,6 +409,8 @@
             const draft = {
                 viatura: document.getElementById('viatura').value,
                 profissional: document.getElementById('profissional').value,
+                coren: document.getElementById('coren').value,
+                matricula: document.getElementById('matricula').value,
                 turno: document.getElementById('turno').value,
                 comentario: document.getElementById('fotoComentario').value,
                 respostas: {}
@@ -428,6 +438,8 @@
                 const draft = JSON.parse(savedDraft);
                 if (draft.viatura) document.getElementById('viatura').value = draft.viatura;
                 if (draft.profissional) document.getElementById('profissional').value = draft.profissional;
+                if (draft.coren) document.getElementById('coren').value = draft.coren;
+                if (draft.matricula) document.getElementById('matricula').value = draft.matricula;
                 if (draft.turno) document.getElementById('turno').value = draft.turno;
                 if (draft.comentario) document.getElementById('fotoComentario').value = draft.comentario;
 
@@ -518,6 +530,8 @@
         async function submitChecklist() {
             const viatura = document.getElementById('viatura').value;
             const profissional = document.getElementById('profissional').value.trim();
+            const coren = document.getElementById('coren').value.trim();
+            const matricula = document.getElementById('matricula').value.trim();
             const turno = document.getElementById('turno').value;
             const fotoComentario = document.getElementById('fotoComentario').value.trim();
 
@@ -543,6 +557,8 @@
                 dataHora: new Date().toLocaleString('pt-BR'),
                 viatura,
                 profissional,
+                coren,
+                matricula,
                 turno,
                 statusGeral: itensPendentes.length === 0 ? "Tudo Certo" : "Com Pendências",
                 pendencias: itensPendentes,
@@ -581,6 +597,8 @@
 
             alert("Checklist enviado com sucesso!");
             document.getElementById('profissional').value = '';
+            document.getElementById('coren').value = '';
+            document.getElementById('matricula').value = '';
             document.getElementById('fotoComentario').value = '';
             removePhoto();
             const indicator = document.getElementById('draftIndicator');
@@ -620,8 +638,10 @@
                             </div>
                             <span class="text-xs text-slate-400 mt-1 sm:mt-0"><i class="fa-regular fa-clock mr-1"></i>${h.dataHora}</span>
                         </div>
-                        <div class="text-xs text-slate-600 mb-2">
-                            <span><strong>Responsável:</strong> ${h.profissional}</span>
+                        <div class="text-xs text-slate-600 mb-2 flex flex-wrap gap-x-3">
+                            <span><strong>Responsável:</strong> ${h.profissional || '-'}</span>
+                            <span><strong>Coren-SP:</strong> ${h.coren || '-'}</span>
+                            <span><strong>Matrícula:</strong> ${h.matricula || '-'}</span>
                         </div>
                 `;
 
